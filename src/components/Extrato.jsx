@@ -52,7 +52,15 @@ export default function Extrato({ transacoes, onDeletar, onQuitar }) {
             Nenhuma transação cadastrada ainda. Comece adicionando uma acima!
           </Typography>
         ) : (
-          <TableContainer component={Paper} sx={{ maxHeight: 400, mt: 2, background: 'transparent' }}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxHeight: 400,
+              mt: 2,
+              background: 'transparent',
+              width: '100%',
+              overflowX: 'auto'
+            }}>
             <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
@@ -77,8 +85,8 @@ export default function Extrato({ transacoes, onDeletar, onQuitar }) {
                     <TableCell>{t.descricao}</TableCell>
                     <TableCell>
                       {/* Badge dinâmico de Status */}
-                      <Chip 
-                        label={t.status === 'concluido' ? (t.tipo === 'receita' ? 'Recebido' : 'Pago') : 'Pendente'} 
+                      <Chip
+                        label={t.status === 'concluido' ? (t.tipo === 'receita' ? 'Recebido' : 'Pago') : 'Pendente'}
                         color={t.status === 'concluido' ? (t.tipo === 'receita' ? 'success' : 'success') : 'warning'}
                         variant={t.status === 'concluido' ? 'filled' : 'outlined'}
                         size="small"
