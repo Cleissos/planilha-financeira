@@ -7,16 +7,21 @@
 //   const [valor, setValor] = useState('');
 //   const [tipo, setTipo] = useState('despesa');
 //   const [categoria, setCategoria] = useState('');
+//   const [bancoCartao, setBancoCartao] = useState(''); // NOVO
 //   const [dataVencimento, setDataVencimento] = useState(new Date().toISOString().split('T')[0]);
 //   const [jaQuitado, setJaQuitado] = useState(false);
 
-//   const categoriasReceita = ['Trabalho', 'Investimentos', 'Presentes', 'Outros'];
-//   const categoriasDespesa = ['Alimentação', 'Transporte', 'Moradia', 'Lazer', 'Saúde', 'Educação', 'Outros'];
+//   // Categorias alinhadas com a Regra dos Potes da sua imagem
+//   const categoriasReceita = ['Trabalho (Salário)', 'Investimentos (Retorno)', 'Outros'];
+//   const categoriasDespesa = ['Gastos Fixos (Moradia/Contas)','Veículo', 'Investimentos', 'Reserva de Emergência', 'Educação', 'Lazer', 'Doação'];
+
+//   // Lista dos seus bancos/cartões
+//   const bancosDisponiveis = ['Nubank', 'PicPay', 'Mercado Pago', 'PagBank', 'Inter', 'Banpará', 'Dinheiro em Espécie'];
 
 //   const handleSubmit = (e) => {
 //     e.preventDefault();
 
-//     if (!descricao || !valor || !categoria || !dataVencimento) {
+//     if (!descricao || !valor || !categoria || !dataVencimento || !bancoCartao) {
 //       alert('Por favor, preencha todos os campos.');
 //       return;
 //     }
@@ -27,6 +32,7 @@
 //       valor: parseFloat(valor),
 //       tipo,
 //       categoria,
+//       bancoCartao, // Salvando o banco escolhido
 //       dataVencimento,
 //       dataPagamento: jaQuitado ? new Date().toISOString().split('T')[0] : null,
 //       status: jaQuitado ? 'concluido' : 'pendente'
@@ -37,6 +43,7 @@
 //     setDescricao('');
 //     setValor('');
 //     setCategoria('');
+//     setBancoCartao('');
 //     setJaQuitado(false);
 //   };
 
@@ -66,7 +73,6 @@
 //             inputProps={{ step: "0.01", min: "0.01" }}
 //             value={valor}
 //             onChange={(e) => setValor(e.target.value)}
-//             // SUGESTÃO 2: Adiciona o símbolo "R$" fixo na esquerda do input
 //             InputProps={{
 //               startAdornment: <InputAdornment position="start">R$</InputAdornment>,
 //             }}
@@ -88,12 +94,27 @@
 //             </Select>
 //           </FormControl>
 
+//           {/* NOVO CAMPO: Origem/Destino do dinheiro */}
 //           <FormControl fullWidth size="small">
-//             <InputLabel id="label-categoria">Categoria</InputLabel>
+//             <InputLabel id="label-banco">Banco / Cartão</InputLabel>
+//             <Select
+//               labelId="label-banco"
+//               value={bancoCartao}
+//               label="Banco / Cartão"
+//               onChange={(e) => setBancoCartao(e.target.value)}
+//             >
+//               {bancosDisponiveis.map(banco => (
+//                 <MenuItem key={banco} value={banco}>{banco}</MenuItem>
+//               ))}
+//             </Select>
+//           </FormControl>
+
+//           <FormControl fullWidth size="small">
+//             <InputLabel id="label-categoria">Pote / Categoria</InputLabel>
 //             <Select
 //               labelId="label-categoria"
 //               value={categoria}
-//               label="Categoria"
+//               label="Pote / Categoria"
 //               onChange={(e) => setCategoria(e.target.value)}
 //             >
 //               {tipo === 'receita' 
@@ -142,21 +163,22 @@
 import { useState } from 'react';
 import { Card, CardContent, Typography, TextField, Button, MenuItem, Box, FormControl, InputLabel, Select, FormControlLabel, Checkbox, InputAdornment } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { obterIconeCategoria, obterConfigBanco } from '../utils/iconesFinanceiros';
 
 export default function FormTransacao({ onAdicionar }) {
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
   const [tipo, setTipo] = useState('despesa');
   const [categoria, setCategoria] = useState('');
-  const [bancoCartao, setBancoCartao] = useState(''); // NOVO
+  const [bancoCartao, setBancoCartao] = useState('');
   const [dataVencimento, setDataVencimento] = useState(new Date().toISOString().split('T')[0]);
   const [jaQuitado, setJaQuitado] = useState(false);
 
-  // Categorias alinhadas com a Regra dos Potes da sua imagem
+  // Categorias alinhadas com a Regra dos Potes e imagem do usuário
   const categoriasReceita = ['Trabalho (Salário)', 'Investimentos (Retorno)', 'Outros'];
-  const categoriasDespesa = ['Gastos Fixos (Moradia/Contas)', 'Investimentos', 'Reserva de Emergência', 'Educação', 'Lazer', 'Doação'];
+  const categoriasDespesa = ['Gastos Fixos (Moradia/Contas)', 'Veículo', 'Investimentos', 'Reserva de Emergência', 'Educação', 'Lazer', 'Doação'];
 
-  // Lista dos seus bancos/cartões
+  // Lista atualizada de bancos baseada nas imagens do usuário
   const bancosDisponiveis = ['Nubank', 'PicPay', 'Mercado Pago', 'PagBank', 'Inter', 'Banpará', 'Dinheiro em Espécie'];
 
   const handleSubmit = (e) => {
@@ -173,7 +195,7 @@ export default function FormTransacao({ onAdicionar }) {
       valor: parseFloat(valor),
       tipo,
       categoria,
-      bancoCartao, // Salvando o banco escolhido
+      bancoCartao,
       dataVencimento,
       dataPagamento: jaQuitado ? new Date().toISOString().split('T')[0] : null,
       status: jaQuitado ? 'concluido' : 'pendente'
@@ -181,6 +203,7 @@ export default function FormTransacao({ onAdicionar }) {
 
     onAdicionar(novaTransacao);
 
+    // Limpa o formulário mantendo a data padrão
     setDescricao('');
     setValor('');
     setCategoria('');
@@ -235,7 +258,6 @@ export default function FormTransacao({ onAdicionar }) {
             </Select>
           </FormControl>
 
-          {/* NOVO CAMPO: Origem/Destino do dinheiro */}
           <FormControl fullWidth size="small">
             <InputLabel id="label-banco">Banco / Cartão</InputLabel>
             <Select
@@ -245,7 +267,19 @@ export default function FormTransacao({ onAdicionar }) {
               onChange={(e) => setBancoCartao(e.target.value)}
             >
               {bancosDisponiveis.map(banco => (
-                <MenuItem key={banco} value={banco}>{banco}</MenuItem>
+                <MenuItem key={banco} value={banco}>
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <Box 
+                      sx={{ 
+                        width: 12, 
+                        height: 12, 
+                        borderRadius: '50%', 
+                        bgcolor: obterConfigBanco(banco).cor 
+                      }} 
+                    />
+                    {banco}
+                  </Box>
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -259,8 +293,26 @@ export default function FormTransacao({ onAdicionar }) {
               onChange={(e) => setCategoria(e.target.value)}
             >
               {tipo === 'receita' 
-                ? categoriasReceita.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)
-                : categoriasDespesa.map(cat => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)
+                ? categoriasReceita.map(cat => (
+                    <MenuItem key={cat} value={cat}>
+                      <Box display="flex" alignItems="center" gap={1.5}>
+                        <Box sx={{ color: obterIconeCategoria(cat).cor, display: 'flex', alignItems: 'center' }}>
+                          {obterIconeCategoria(cat).icone}
+                        </Box>
+                        {cat}
+                      </Box>
+                    </MenuItem>
+                  ))
+                : categoriasDespesa.map(cat => (
+                    <MenuItem key={cat} value={cat}>
+                      <Box display="flex" alignItems="center" gap={1.5}>
+                        <Box sx={{ color: obterIconeCategoria(cat).cor, display: 'flex', alignItems: 'center' }}>
+                          {obterIconeCategoria(cat).icone}
+                        </Box>
+                        {cat}
+                      </Box>
+                    </MenuItem>
+                  ))
               }
             </Select>
           </FormControl>
